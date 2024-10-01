@@ -1,10 +1,10 @@
 class JewelryItem:
     def __init__(self, item_id: int, item_type: str, material_id: int, weight: float, price: float):
-        self.__item_id = item_id        # Первичный ключ
-        self.__item_type = item_type    # Тип изделия
-        self.__material_id = material_id # Внешний ключ, ссылается на материал
-        self.__weight = weight          # Вес изделия в граммах
-        self.__price = price            # Стоимость изделия
+        self.__item_id = item_id
+        self.__item_type = item_type
+        self.__material_id = material_id
+        self.__weight = weight
+        self.__price = price
 
     # Геттеры
     def get_item_id(self) -> int:
@@ -37,3 +37,11 @@ class JewelryItem:
 
     def __str__(self) -> str:
         return f"JewelryItem(id={self.__item_id}, type={self.__item_type}, material_id={self.__material_id}, weight={self.__weight}, price={self.__price})"
+
+
+jewelry_item = JewelryItem(item_id=1, item_type="Ring", material_id=101, weight=10.5, price=250.0)
+
+print(jewelry_item)
+
+jewelry_item.set_item_type("Bracelet")
+print(jewelry_item.get_item_type())
