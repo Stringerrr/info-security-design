@@ -97,27 +97,46 @@ class JewelryItem:
     def set_price(self, price: float):
         self.__price = self.__validate(price, (float, int), non_negative=True)
 
+class ShortJewelryItem:
+    def __init__(self, item_id: int, item_type: str, price: float):
+        self.__item_id = item_id
+        self.__item_type = item_type
+        self.__price = price
+
+    def __repr__(self) -> str:
+        """Полная версия объекта"""
+        return (f"ShortJewelryItem(item_id={self.__item_id}, "
+                f"item_type='{self.__item_type}', price={self.__price})")
+
+    def short_description(self) -> str:
+        """Краткая версия объекта"""
+        return f"{self.__item_type} (ID: {self.__item_id}, Price: {self.__price})"
+
+    # Геттеры
+    def get_item_id(self) -> int:
+        return self.__item_id
+
+    def get_item_type(self) -> str:
+        return self.__item_type
+
+    def get_price(self) -> float:
+        return self.__price
+
 
 # Пример использования класса
 try:
+    # Создание экземпляра JewelryItem
     jewelry_item = JewelryItem(item_id=1, item_type="Ring", material_id=101, weight=10.5, price=250.0)
     print(jewelry_item)  # Полная версия
-    print(jewelry_item.short_description())  # Краткая версия
-jewelry_item_from_string = JewelryItem.from_string("2, Necklace, 102, 15.0, 300.0")
-    print(jewelry_item_from_string)
 
-    json_data = '{"item_id": 3, "item_type": "Bracelet", "material_id": 103, "weight": 20.0, "price": 400.0}'
-    jewelry_item_from_json = JewelryItem.from_json(json_data)
-    print(jewelry_item_from_json)
+    # Создание краткой версии на основе JewelryItem
+    short_jewelry_item = ShortJewelryItem(item_id=jewelry_item.get_item_id(),
+                                           item_type=jewelry_item.get_item_type(),
+                                           price=jewelry_item.get_price())
+    print(short_jewelry_item)  # Полная версия краткой версии
+    print(short_jewelry_item.short_description())  # Краткая версия
 
-    # Сравнение объектов
-    print(jewelry_item == jewelry_item_from_string)  # False
-
-    # Создание копии jewelry_item
-    jewelry_item_copy = JewelryItem(item_id=1, item_type="Ring", material_id=101, weight=10.5, price=250.0)
-    print(jewelry_item == jewelry_item_copy)  # True
-
-    # Попытка создать объект с невалидными полями
-    invalid_jewelry_item = JewelryItem(item_id=-1, item_type="", material_id=0, weight=-5, price=-50)
 except ValueError as e:
     print(f"Ошибка создания объекта: {e}")
+
+
