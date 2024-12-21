@@ -1,0 +1,44 @@
+[
+    {
+        "name": "chain",
+        "cost": 400,
+        "size": 45,
+        "SKU": 1064,
+        "item_id": 5
+    },
+    {
+        "name": "chain",
+        "cost": 550,
+        "size": 45,
+        "SKU": 1060,
+        "item_id": 6
+    },
+    {
+        "name": "chain",
+        "cost": 400,
+        "size": 45,
+        "SKU": 1062,
+        "item_id": 7
+    },
+    {
+        "name": "chain",
+        "cost": 600,
+        "size": 55,
+        "SKU": 1069,
+        "item_id": 4
+    },
+    {
+        "name": "Ring",
+        "cost": 150,
+        "size": 17,
+        "SKU": 1063,
+        "item_id": 1
+    },
+    {
+        "name": "Ring",
+        "cost": 100,
+        "size": 16,
+        "SKU": 1061,
+        "item_id": 8
+    }
+]
