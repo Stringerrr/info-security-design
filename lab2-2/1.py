@@ -41,13 +41,16 @@ class GoldRepJson:
 
     def sort_by_field(self, field):
         try:
-            self.data.sort(key=lambda x: x[field])
+            self.data.sort(key=lambda x: x[field].lower())
         except KeyError:
             print(f"Поле {field} отсутствует в данных.")
 
     def add_object(self, item):
         if not isinstance(item, dict):
             print("Ошибка: объект должен быть словарем.")
+            return
+        if any(existing_item.get('SKU') == item.get('SKU') for existing_item in self.data):
+            print(f"Объект с таким SKU уже существует")
             return
         try:
             new_id = max([obj['item_id'] for obj in self.data]) + 1
@@ -57,6 +60,11 @@ class GoldRepJson:
         self.data.append(item)
 
     def update_object_by_id(self, item_id, new_data):
+
+        if any(existing_item.get('SKU') == item.get('SKU') for existing_item in self.data):
+            print(f"Объект с таким SKU уже существует")
+            return
+
         for item in self.data:
             if item['item_id'] == item_id:
                 item.update(new_data)
@@ -76,17 +84,17 @@ class GoldRepJson:
 if __name__ == '__main__':
     repo = GoldRepJson("file.json")
 
-    repo.add_object({"name": "Ring", "cost": 100})
-    repo.add_object({"name": "Chain", "cost": 400})
+    repo.add_object({"name": "Ring", "cost": 100, "size": 16, "SKU": 1061, "item_id": 1})
+    repo.add_object({"name": "chain", "cost": 400, "size": 45, "SKU": 1062, "item_id": 2})
     repo.save_to_file()
 
     print(repo.get_by_id(1))
     print(repo.get_k_n_short_list(1, 1))
 
-    repo.sort_by_field("cost")
+    repo.sort_by_field("name")
     repo.save_to_file()
 
-    repo.update_object_by_id(1, {"cost": 150})
+    repo.update_object_by_id(1, {"cost": 150}, )
     repo.save_to_file()
 
     repo.delete_object_by_id(2)
