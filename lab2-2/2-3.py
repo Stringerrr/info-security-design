@@ -2,9 +2,36 @@ import json
 import yaml
 
 class GoldRepBase:
-    def __init__(self, file_path):
-        self.file_path = file_path
-        self.data = []
+    def __init__(self, file_path=None, data=None):
+        self.__file_path = golddb.json
+        self.__data = data if data is not None else []
+
+    # Инкапсуляция
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data(self, value):
+        self.__data = value
+
+    @property
+    def file_path(self):
+        return self.__file_path
+
+    @file_path.setter
+    def file_path(self, value):
+        self.__file_path = value
+
+    # Валидация
+    @staticmethod
+    def validate_object(item):
+        if not isinstance(item, dict):
+            raise ValueError("Объект должен быть словарем")
+        if "name" not in item or "cost" not in item:
+            raise ValueError("Объект должен содержать поля 'name' и 'cost'")
+        if not isinstance(item['name'], str) or not isinstance(item['cost'], (int, float)):
+            raise ValueError("'name' должен быть строкой, а 'cost' числом")
 
     def load_from_file(self):
         raise NotImplementedError("Ошибка")
@@ -34,9 +61,12 @@ class GoldRepBase:
             print(f"Поле {field} отсутствует в данных")
 
     def add_object(self, item):
-        if not isinstance(item, dict):
-            print("Ошибка. Объект должен быть словарем")
+        try:
+            self.validate_object(item)
+        except ValueError as e:
+            print(f"Ошибка: {e}")
             return
+
         try:
             new_id = max([obj['item_id'] for obj in self.data]) + 1
         except ValueError:
@@ -61,7 +91,22 @@ class GoldRepBase:
     def get_count(self):
         return len(self.data)
 
+    def __str__(self):
+        return f"Полная версия объекта: {self.data}"
+
+    def __repr__(self):
+        return f"Краткая версия объекта: {self.get_k_n_short_list(5, 1)}"
+
+    def __eq__(self, other):
+        if not isinstance(other, GoldRepBase):
+            return False
+        return self.data == other.data
+
+
 class GoldRepJson(GoldRepBase):
+    def __init__(self, file_path=None, data=None):
+        super().__init__(file_path, data)
+
     def load_from_file(self):
         try:
             with open(self.file_path, 'r') as file:
@@ -82,6 +127,9 @@ class GoldRepJson(GoldRepBase):
 
 
 class GoldRepYaml(GoldRepBase):
+    def __init__(self, file_path=None, data=None):
+        super().__init__(file_path, data)
+
     def load_from_file(self):
         try:
             with open(self.file_path, 'r', encoding='utf-8') as file:
@@ -102,11 +150,67 @@ class GoldRepYaml(GoldRepBase):
 
 if __name__ == '__main__':
     fl_json = GoldRepJson("file.json")
-    fl_json.add_object({"name": "Ring", "cost": 100})
-    fl_json.save_to_file()
-    print(fl_json.get_by_id(1))
-
     fl_yaml = GoldRepYaml("file.yaml")
+
+    fl_json.add_object({"name": "Ring", "cost": 100})
     fl_yaml.add_object({"name": "Chain", "cost": 400})
+
+    fl_json.save_to_file()
     fl_yaml.save_to_file()
+
+    fl_json.load_from_file()
+    fl_yaml.load_from_file()
+
+    print("Получаем объект по ID из JSON:")
+    print(fl_json.get_by_id(1))
+    print("Получаем объект по ID из YAML:")
     print(fl_yaml.get_by_id(1))
+
+    print("\nПолная версия данных JSON:")
+    print(fl_json)
+    print("Полная версия данных YAML:")
+    print(fl_yaml)
+
+    print("\nКраткая версия данных JSON:")
+    print(fl_json.__repr__())
+    print("Краткая версия данных YAML:")
+    print(fl_yaml.__repr__())
+
+    fl_json.sort_by_field("name")
+    fl_yaml.sort_by_field("name")
+
+    print("\nДанные JSON после сортировки по имени:")
+    print(fl_json)
+    print("Данные YAML после сортировки по имени:")
+    print(fl_yaml)
+
+    print("\nКраткий список JSON (1-я страница, 2 объекта):")
+    print(fl_json.get_k_n_short_list(2, 1))
+    print("Краткий список YAML (1-я страница, 2 объекта):")
+    print(fl_yaml.get_k_n_short_list(2, 1))
+
+    fl_json.update_object_by_id(1, {"name": "Gold Ring", "cost": 120})
+    fl_yaml.update_object_by_id(1, {"name": "Gold Chain", "cost": 450})
+
+    print("\nДанные JSON после обновления:")
+    print(fl_json.get_by_id(1))
+    print("Данные YAML после обновления:")
+    print(fl_yaml.get_by_id(1))
+
+    fl_json.delete_object_by_id(1)
+    fl_yaml.delete_object_by_id(1)
+
+    print("\nДанные JSON после удаления:")
+    print(fl_json.get_by_id(1))
+    print("Данные YAML после удаления:")
+    print(fl_yaml.get_by_id(1))
+
+    print("\nКоличество объектов в JSON:", fl_json.get_count())
+    print("Количество объектов в YAML:", fl_yaml.get_count())
+
+    json_copy = GoldRepJson("file.json")
+    json_copy.add_object({"name": "Ring", "cost": 100})
+    print("\nРавенство объектов JSON:")
+    print(fl_json == json_copy)
+    print(fl_json == fl_yaml)
+
